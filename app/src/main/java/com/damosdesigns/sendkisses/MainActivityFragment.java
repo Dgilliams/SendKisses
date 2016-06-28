@@ -66,7 +66,8 @@ public class MainActivityFragment extends Fragment {
                         if (sendSMS(getContext(), mPhoneInput.getText().toString(), "\uD83D\uDE17")) {
                             mActivity.incrementKissCount();
                         }
-                    }
+                    } else
+                        Toast.makeText(getContext(), "Recipient doesn't have a supported phone number", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getContext(), "Permission to send SMS is disabled. Re-enable it in settings.", Toast.LENGTH_SHORT).show();
                 }
@@ -208,13 +209,12 @@ public class MainActivityFragment extends Fragment {
     public static boolean sendSMS(Context context, String phoneNumber, String msg) {
         try {
             SmsManager smsManager = SmsManager.getDefault();
-//            smsManager.sendTextMessage("3868486404", null, msg, null, null);
             smsManager.sendTextMessage(phoneNumber, null, msg, null, null);
             Toast.makeText(context, "Kisses sent to your love!", Toast.LENGTH_LONG).show();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(context, "Dearest Apologies, message not sendable", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Dearest Apologies, message not sendable. Have you selected a recipient? Click the heart!", Toast.LENGTH_LONG).show();
             return false;
         }
     }
