@@ -40,15 +40,6 @@ public class MainActivity extends AppCompatActivity {
         mRecipientName = (TextView) findViewById(R.id.recipient_name);
         mTitle = (TextView) findViewById(R.id.kiss_title);
         mPlus = findViewById(R.id.plus_icon);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     @Override
@@ -79,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
                                 null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{id},
                                 null);
 
+                        int nameIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Nickname.DISPLAY_NAME);
                         int phoneIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DATA);
-                        int nameIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME);
 
                         // let's just get the first phone
                         if (cursor.moveToFirst()) {
