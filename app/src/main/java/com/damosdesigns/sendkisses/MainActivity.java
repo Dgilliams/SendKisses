@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView mRecipientName;
     private TextView mTitle;
     private View mPlus;
+    private ImageView mHeartImageForeground;
+    private ImageView mHeartImageBackground;
+    private int mHeartImageColor;
 
     private int kissCount = 0;
     private String currentKissRecipientName;
@@ -36,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-
         mPhoneInput = (TextView) findViewById(R.id.input_phone_number);
         mRecipientName = (TextView) findViewById(R.id.recipient_name);
         mTitle = (TextView) findViewById(R.id.kiss_title);
         mPlus = findViewById(R.id.plus_icon);
+        mHeartImageForeground = (ImageView) findViewById(R.id.recipient_image_foreground);
+        mHeartImageBackground = (ImageView) findViewById(R.id.recipient_image_background);
+        mHeartImageColor = Util.returnRandomMaterialColor(this);
         retrievePreferences();
     }
 
@@ -48,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-       retrievePreferences();
+        retrievePreferences();
         updateHeart();
     }
 
@@ -66,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void retrievePreferences(){
+    private void retrievePreferences() {
         kissCount = Util.readSharedPref(this, R.string.pref_kisses_sent, 0);
         currentKissRecipientName = Util.readSharedPref(this, R.string.pref_current_recipient_name, "");
         currentKissRecipientNumber = Util.readSharedPref(this, R.string.pref_current_recipient_number, "");
     }
 
-    private void updateUserSharedPrefs(){
+    private void updateUserSharedPrefs() {
         Util.writeToSharedPreferences(this, R.string.pref_current_recipient_name, currentKissRecipientName);
         Util.writeToSharedPreferences(this, R.string.pref_current_recipient_number, currentKissRecipientNumber);
     }
@@ -83,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode) {
                 case CONTACT_PICKER_RESULT:
                     String[] info = getContact(data);
-                    currentKissRecipientName = info[0];
-                    currentKissRecipientNumber = info[1];
+                    currentKissRecipientNumber = info[0];
+                    currentKissRecipientName = info[1];
                     updateUserSharedPrefs();
                     setUserPic(currentKissRecipientName, currentKissRecipientNumber);
                     break;
@@ -135,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
 
             // let's just get the first phone
             if (cursor.moveToFirst()) {
-                phone = cursor.getString(phoneIdx);
-                name = cursor.getString(nameIdx);
+                result[0] =  phone = cursor.getString(phoneIdx);
+                result[1] = name = cursor.getString(nameIdx);
                 Log.v(TAG, "Got phone: " + phone);
             } else {
                 Log.w(TAG, "No results");
@@ -148,9 +154,6 @@ public class MainActivity extends AppCompatActivity {
                 cursor.close();
             }
 
-            result[0] = name;
-            result[1] = phone;
-
             if (phone.length() == 0) {
                 Toast.makeText(this, "No phone found for contact.", Toast.LENGTH_LONG).show();
             }
@@ -161,10 +164,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateHeart() {
         currentKissRecipientName = Util.readSharedPref(this, R.string.pref_current_recipient_name, "");
-        if (currentKissRecipientName.length() > 0)
-            setUserPic(currentKissRecipientNumber, currentKissRecipientName);
-
-        else
+        if (currentKissRecipientName.length() > 0) {
+            setUserPic(currentKissRecipientName, currentKissRecipientNumber);
+            Util.textAnimation(mTitle, kissCount, " Kisses Sent!");
+//            mTitle.setText(kissCount + " Kisses Sent!");
+        } else
             setUserPicToPlus();
     }
 
@@ -182,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void setUserPicToPlus() {
         mTitle.setVisibility(View.INVISIBLE);
         mPlus.setVisibility(View.VISIBLE);
@@ -190,5 +193,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void incrementKissCount() {
         mTitle.setText(++kissCount + " Kisses Sent!");
+        animateHeart();
+        Util.writeToSharedPreferences(this, R.string.pref_kisses_sent, kissCount);
+    }
+
+    public void animateHeart(){
+        mHeartImageBackground.setColorFilter(mHeartImageColor);
+        mHeartImageColor = Util.returnRandomMaterialColor(this);
+        mHeartImageForeground.setColorFilter(mHeartImageColor);
+        Util.circularReveal(mHeartImageForeground);
     }
 }
