@@ -46,8 +46,7 @@ public class MainActivityFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mActivity = (MainActivity) getActivity();
 
@@ -61,9 +60,11 @@ public class MainActivityFragment extends Fragment {
                 vibe = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
                 vibe.vibrate(500);
                 checkSMSPermission();
+
+
                 if (mHasSMSPermission) {
                     if (mPhoneInputIsValid) {
-                        if (sendSMS(getContext(), mPhoneInput.getText().toString(), "\uD83D\uDE17")) {
+                        if (sendSMS(getContext(), Util.readSharedPref(mActivity, R.string.pref_current_recipient_number, ""), "\uD83D\uDE17")) {
                             mActivity.incrementKissCount();
                         }
                     } else
@@ -90,7 +91,6 @@ public class MainActivityFragment extends Fragment {
 
         return mRoot;
     }
-
 
     private void checkSMSPermission() {
         // Here, thisActivity is the current activity
@@ -197,7 +197,6 @@ public class MainActivityFragment extends Fragment {
             // permissions this app might request
         }
     }
-
 
     public void doLaunchContactPicker(View view) {
 
